@@ -1,10 +1,10 @@
-# <img src="images/chug-logo.png" alt="Dataset Banner" width="25"> BrightRate: Quality Assessment for User-Generated HDR Videos
+# BrightRate: Quality Assessment for User-Generated HDR Videos
 
 
 
 <!-- Will update these links after receiving the decision>  -->
 
-[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-green)](https://creativecommons.org/licenses/by-nc/4.0/) [![Paper](https://img.shields.io/badge/Paper-PDF-red)](./static/pdfs/chug.pdf) [![Supplementary](https://img.shields.io/badge/Supplementary-PDF-blue)](./static/pdfs/chug-supp.pdf) \
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-green)](https://creativecommons.org/licenses/by-nc/4.0/) [![Paper](https://img.shields.io/badge/Paper-PDF-red)](./static/pdfs/brightrate.pdf) [![Supplementary](https://img.shields.io/badge/Supplementary-PDF-blue)](./static/pdfs/brightrate-supp.pdf) \
 [![IEEE Xplore](https://img.shields.io/badge/View%20on-IEEE%20Xplore-blue)](https://ieeexplore.ieee.org/document/YOUR_PAPER_ID) [![arXiv](https://img.shields.io/badge/View%20on-arXiv-red)](https://arxiv.org/abs/YOUR_ARXIV_ID)
 
 
@@ -80,7 +80,7 @@ Police: [https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/ad8affdd94b3c44ae
 #### **2️⃣ Downloading Videos Using AWS CLI**
 To download all videos:
 ```sh
-cat chug-video.txt | while read video; do
+cat BrightVQ.txt | while read video; do
     aws s3 cp s3://ugchdrmturk/videos/${video}.mp4 ./BrightVQ/
 done
 ```
@@ -168,7 +168,7 @@ Please cite us if this work is helpful to you.
 **COMING SOON**
 
 ## 📜 License
-CHUG is released under a Creative Commons Attribution-NonCommercial (CC BY-NC 4.0) License.
+BrightVQ is released under a Creative Commons Attribution-NonCommercial (CC BY-NC 4.0) License.
 
 ## 📬 Contact
 For questions, please reach out:
