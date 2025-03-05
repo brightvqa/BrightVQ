@@ -150,7 +150,7 @@
   let currentIndex = 0;
 
   // Fetch JSON data
-  fetch("http://localhost:8000/images_data.json")
+  fetch("https://raw.githubusercontent.com/brightvqa/BrightVQ/main/images_data.json")
     .then(response => response.json())
     .then(images => {
       imagesData = images;
