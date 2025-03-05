@@ -22,6 +22,8 @@
   <!-- Bulma Carousel CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-carousel/dist/css/bulma-carousel.min.css">
   <script defer src="static/js/fontawesome.all.min.js"></script>
+
+
 </head>
 
 <body>
@@ -80,203 +82,467 @@
   <section class="section">
     <div class="container is-max-desktop">
       <div class="column">
-        <img src="static/images/fig-1.png" alt="Overall Figure" style="width:100%;">
-        <p class="has-text-centered">Content categories and challenging scenes in BrightVQA.</p>
+        <img src="images/fig-1.jpg" alt="Overall Figure" style="width:100%;">
+        <!-- <p class="has-text-centered">Content categories and challenging scenes in BrightVQA.</p> -->
       </div>
     </div>
   </section>
 
-  
-<!-- Carousel Section -->
+<!-- Dataset Abstract -->
 <section class="section">
   <div class="container is-max-desktop">
-    <h2 class="title is-3">Distortions</h2>
-    <div class="carousel carousel-animated carousel-animate-slide" data-autoplay="true">
-      <div class="carousel-container">
-        <div class="carousel-item is-active">
-          <figure class="image">
-            <img src="static/images/amt-interface.png" alt="AMT Study Interface">
-            <figcaption class="has-text-centered mt-2"></figcaption>
-          </figure>
-        </div>
-      </div>
-      <div class="carousel-navigation is-overlay">
-        <div class="carousel-nav-left">
-          <button class="button is-text" aria-label="Previous slide">
-            <span class="icon is-large">
-              <i class="fas fa-chevron-left fa-lg" aria-hidden="true"></i>
-            </span>
-          </button>
-        </div>
-        <div class="carousel-nav-right">
-          <button class="button is-text" aria-label="Next slide">
-            <span class="icon is-large">
-              <i class="fas fa-chevron-right fa-lg" aria-hidden="true"></i>
-            </span>
-          </button>
+    <h2 class="title is-">
+      Abstract
+    </h2>
+    <div class="card">
+      <div class="card-content">
+        <div class="content has-text-justified">
+          <p style="font-size: 1.2rem; line-height: 1.6;">
+            <strong>High Dynamic Range (HDR) videos</strong> offer superior luminance and color fidelity compared to Standard Dynamic Range (SDR) content. The rapid growth of <b>User-Generated Content (UGC)</b> on platforms such as YouTube, Instagram, and TikTok has significantly increased the volume of streamed and shared UGC videos. This newer category of videos introduces <b>challenges for No-Reference (NR) Video Quality Assessment (VQA)</b> models specialized for HDR UGC due to varied distortions from diverse capture, editing, and processing conditions.Towards addressing this issue, we introduce <b><i>BrightVQ</b></i>, a sizeable new psychometric data resource. It is the first large-scale subjective video quality database dedicated to the quality modelling of HDR UGC videos. <b><i>BrightVQ</b></i> comprises 2,100 videos, on which we collected 73,794 perceptual quality ratings. Using this dataset, we also developed <b><i>BrightRate</b></i>, a novel video quality prediction model designed to capture both UGC-specific distortions coexisting with HDR-specific artifacts. Extensive experimental results demonstrate that <b><i>BrightRate</b></i> achieves state-of-the-art performance on both the new <b><i>BrightVQ</b></i> data resource and on other existing HDR databases.
+          </p>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
-<!-- Add this script at the end of your body tag if not already present -->
+
+
+<!-- Carousel Section -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Distorted Frames in BrightVQ</h2>
+    <p>
+      We show some frames of videos in our <b><i>BrightVQ</i></b> dataset with the predicted scores (by <b><i>BrightRate</i></b>) and actual MOS.
+    </p>
+    <br>
+    <div class="carousel-container" style="display: flex; flex-direction: column; align-items: center;">
+      <div class="carousel-item" id="carouselItem" 
+           style="width: 1000px; height: 600px; display: flex; justify-content: center; align-items: center; background: #f5f5f5; border-radius: 10px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+        <figure class="image" style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+          <img id="carouselImage" src="" alt="Distorted Frame" style="width: 100%; height: 100%; object-fit: contain;">
+        </figure>
+      </div>
+
+      <!-- Scores below the image -->
+      <div id="carouselCaption" class="has-text-centered mt-3" 
+           style="width: 1000px; padding: 10px; background: #fff; border-radius: 5px; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);">
+        <p><strong>Predicted Score:</strong> <span id="score1"></span> | <strong>Actual MOS:</strong> <span id="score2"></span></p>
+      </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="buttons is-centered mt-4">
+      <button class="button is-dark" id="prevBtn">
+        <span class="icon"><i class="fas fa-chevron-left"></i></span>
+        <span>Previous</span>
+      </button>
+      <button class="button is-dark" id="nextBtn">
+        <span>Next</span>
+        <span class="icon"><i class="fas fa-chevron-right"></i></span>
+      </button>
+    </div>
+  </div>
+</section>
+
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var carousels = bulmaCarousel.attach('.carousel', {
-      slidesToScroll: 1,
-      slidesToShow: 1,
-      infinite: true,
-      autoplay: true,
-      autoplaySpeed: 5000,
-      pauseOnHover: true
-    });
+  let imagesData = [];
+  let currentIndex = 0;
+
+  // Fetch JSON data
+  fetch("http://localhost:8000/images_data.json")
+    .then(response => response.json())
+    .then(images => {
+      imagesData = images;
+      updateCarousel(); // Show the first image
+    })
+    .catch(error => console.error("Error loading images:", error));
+
+  function updateCarousel() {
+    if (imagesData.length === 0) return; // Avoid errors if data is empty
+
+    const imageElement = document.getElementById("carouselImage");
+    const score1Element = document.getElementById("score1");
+    const score2Element = document.getElementById("score2");
+
+    imageElement.src = imagesData[currentIndex].src;
+    imageElement.alt = `Distorted Frame ${currentIndex + 1}`;
     
-    // Access instance
-    var carousel = carousels[0];
-    
-    // Add event listeners if needed
-    carousel.on('before:show', function() {
-      console.log('Slide changing');
-    });
+    // Update score values
+    score1Element.textContent = imagesData[currentIndex].score1;
+    score2Element.textContent = imagesData[currentIndex].score2;
+
+    score1Element.textContent = parseFloat(imagesData[currentIndex].score1).toFixed(2);
+    score2Element.textContent = parseFloat(imagesData[currentIndex].score2).toFixed(2);    
+  }
+
+  document.getElementById("prevBtn").addEventListener("click", () => {
+    currentIndex = (currentIndex - 1 + imagesData.length) % imagesData.length; // Loop back
+    updateCarousel();
+  });
+
+  document.getElementById("nextBtn").addEventListener("click", () => {
+    currentIndex = (currentIndex + 1) % imagesData.length; // Loop forward
+    updateCarousel();
   });
 </script>
 
-  <!-- Steps to Access Dataset -->
-  <section class="section">
-    <div class="container is-max-desktop">
-      <h2 class="title is-3">How to Access the Dataset</h2>
-      <ol>
-        <li>Visit our <a href="https://github.com/brightvqa/BrightVQ/" target="_blank">GitHub repository</a> to access metadata files. (We recommend visiting the GitHub repository or Supplementary material for detailed instructions)</li>
-        <li>Download video IDs from <code>BrightVQ.txt</code>.</li>
-        <li>Use AWS CLI to download single videos (replace VIDEO_ID with the actual video ID):
-          <pre><code>aws s3 cp s3://ugchdrmturk/videos/VIDEO_ID.mp4 ./BrightVQ_Videos/</code></pre>
-        </li>
-        <li>Use AWS CLI to download all videos:
-          <pre><code>cat chug-video.txt | while read video; do
+
+<!-- Steps to Access Dataset -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">How to Access the Dataset</h2>
+    
+    <div class="columns is-multiline">
+      
+      <!-- Step 1 -->
+      <div class="column is-full">
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title">
+              Method 1: Visit the GitHub Repository
+            </p>
+          </header>
+          <div class="card-content">
+            <p>Access metadata files from our official <a href="https://github.com/brightvqa/BrightVQ/" target="_blank">GitHub repository</a>. 
+            We recommend checking the Supplementary material for detailed instructions.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="column is-full">
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title">
+              Method 2: Download Video IDs
+            </p>
+          </header>
+          <div class="card-content">
+            <p>Download the video ID list from:<code>BrightVQ.txt</code> </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="column is-full">
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title">
+              Method 3: Download a Single Video
+            </p>
+          </header>
+          <div class="card-content">
+            <p>Use the following AWS CLI command to download a specific video by replacing <code>VIDEO_ID</code>:</p>
+            <pre><code>aws s3 cp s3://ugchdrmturk/videos/VIDEO_ID.mp4 ./BrightVQ_Videos/</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="column is-full">
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title">
+              Method 4: Bulk Download All Videos
+            </p>
+          </header>
+          <div class="card-content">
+            <p>To download all videos in batch mode, run:</p>
+            <pre><code>cat chug-video.txt | while read video; do
   aws s3 cp s3://ugchdrmturk/videos/${video}.mp4 ./BrightVQ_Videos/
-done
-          </code></pre>
-        </li>
-        <li>To play videos directly, replace <code>VIDEO_ID</code> in this URL:<br>
-          <a href="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/VIDEO_ID.mp4" target="_blank">https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/VIDEO_ID.mp4</a></li>
-        Eg: <a href="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/9ae245a27cc5ea9d2f3fae9692250281.mp4" target="_blank">https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/9ae245a27cc5ea9d2f3fae9692250281.mp4</a>
-      </ol>
-    </div>
-  </section>
-
-  <!-- Dataset Abstract -->
-  <section class="section">
-    <div class="container is-max-desktop">
-      <h2 class="title is-3">Abstract</h2>
-      <div class="content has-text-justified">
-        <p>
-          High Dynamic Range (HDR) videos offer superior luminance and color fidelity as compared to Standard Dynamic Range (SDR) content. The rapid growth of User-Generated Content (UGC) on platforms such as YouTube, Instagram, and TikTok has brought a significant increase in the volumes of streamed and shared UGC videos. This newer category of videos brings new challenges to the development of effective No-Reference (NR) video quality assessment (VQA) models specialized to HDR UGC, because of the extreme variety and severities of distortions, arising from diverse capture, editing, and processing outcomes. Towards addressing this issue, we introduce BrightVQ, a sizeable new psychometric data resource. It is the first large-scale subjective video quality database dedicated to the quality modelling of HDR UGC videos. BrightVQ comprises 2,100 videos, on which we collected 73,794 perceptual quality ratings. Using this dataset, we also developed BrightRate, a novel video quality prediction model designed to capture both UGC-specific distortions coexisting with HDR-specific artifacts. Extensive experimental results demonstrate that BrightRate achieves state-of-the-art performance on both the new BrightVQ data resource and on other existing HDR databases.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Sample Video Embeds -->
-  <section class="section hero is-light">
-    <div class="container is-max-desktop">
-      <h2 class="title is-3">Sample Videos (Portraits)</h2>
-      <div class="columns is-multiline">
-        <!-- 18 Embedded Videos -->
-        <div class="column is-one-third">
-          <video width="100%" controls>
-            <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/9ae245a27cc5ea9d2f3fae9692250281.mp4" type="video/mp4">
-          </video>
-          <p>Indoor Scene</p>
-        </div>
-        <div class="column is-one-third">
-          <video width="100%" controls>
-            <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/6ecb44305c0a4c421201b7bcfd369acb.mp4" type="video/mp4">
-          </video>
-          <p>Museum</p>
-        </div>
-        <div class="column is-one-third">
-          <video width="100%" controls>
-            <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/3c3383f24edcecacbc34650e30aa2f64.mp4" type="video/mp4">
-          </video>
-          <p>Costumes</p>
-        </div>
-        <div class="column is-one-third">
-          <video width="100%" controls>
-            <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/29111a67d169ffa7efafb7fdc95b0191.mp4" type="video/mp4">
-          </video>
-          <p>Kayaking</p>
-        </div>
-        <div class="column is-one-third">
-          <video width="100%" controls>
-            <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/1332df49188edc90be56df16975925ae.mp4" type="video/mp4">
-          </video>
-          <p>City</p>
-        </div>
-        <div class="column is-one-third">
-          <video width="100%" controls>
-            <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/7435fdf9b5cda9a4299a7be5707ff911.mp4" type="video/mp4">
-          </video>
-          <p>Mountains</p>
+done</code></pre>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- Sample Video Embeds -->
-  <section class="section hero is-light">
-    <div class="container is-max-desktop">
-      <h2 class="title is-3">Sample Videos (Landscapes)</h2>
-      <div class="columns is-multiline">
-        <!-- 18 Embedded Videos -->
-        <div class="column is-one-third">
-          <video width="100%" controls>
-            <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/273a5d8a3b8c2d0eb4d4c8ff5fcfe360.mp4" type="video/mp4">
-          </video>
-          <p>Carousel</p>
-        </div>
-        <div class="column is-one-third">
-          <video width="100%" controls>
-            <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/482dc1789b58cd2a353408602e9cd903.mp4" type="video/mp4">
-          </video>
-          <p>Nature</p>
-        </div>
-        <div class="column is-one-third">
-          <video width="100%" controls>
-            <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/711db6f2e68898d8ff6c3755959b4b58.mp4" type="video/mp4">
-          </video>
-          <p>Sunset</p>
-        </div>
-        <div class="column is-one-third">
-          <video width="100%" controls>
-            <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/872987b2f1fb9ae521bb530cc81431bc.mp4" type="video/mp4">
-          </video>
-          <p>Screen</p>
-        </div>
-        <div class="column is-one-third">
-          <video width="100%" controls>
-            <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/422c625efdcdb6df6da4ec26d5d52ddd.mp4" type="video/mp4">
-          </video>
-          <p>Light Show</p>
-        </div>
-        <div class="column is-one-third">
-          <video width="100%" controls>
-            <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/049e611e4432f4aabdd5f54f22d1f358.mp4" type="video/mp4">
-          </video>
-          <p>Birds</p>
+      <!-- Step 5 -->
+      <div class="column is-full">
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title">
+              Method 5: Play Videos Directly
+            </p>
+          </header>
+          <div class="card-content">
+            <p>Replace <code>VIDEO_ID</code> in this URL to stream a video directly:</p>
+            <a href="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/VIDEO_ID.mp4" target="_blank">
+              https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/VIDEO_ID.mp4
+            </a>
+            <p class="mt-2"><strong>Example:</strong></p>
+            <a href="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/9ae245a27cc5ea9d2f3fae9692250281.mp4" target="_blank">
+              https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/9ae245a27cc5ea9d2f3fae9692250281.mp4
+            </a>
+          </div>
         </div>
       </div>
+
     </div>
-  </section>
+  </div>
+</section>
 
   <!-- Paper poster -->
-  <section class="hero is-small is-light">
+  <!-- <section class="hero is-small is-light">
     <div class="hero-body">
       <div class="container">
         <h2 class="title">Paper</h2>
         <iframe src="static/pdfs/BrightRate.pdf" width="100%" height="550"></iframe>
       </div>
     </div>
+  </section> -->
+
+    <!-- BrightRate model -->
+    <section class="section">
+      <div class="container is-max-desktop">
+
+      <!-- <div class="container"> -->
+        <h2 class="title">BrightRate</h2>
+
+        <div class="content">
+          <p>
+            We introduce <b><i>BrightRate</i></b>, a novel No-Reference (NR) Video Quality Assessment (VQA) model designed to capture <b>UGC-specific distortions</b> and <b>HDR-specific artifacts</b>.
+          </p>
+          <h4 class="subtitle">Main Modules for <b><i>BrightRate</i></b>:</h4>
+          <ul>
+            <li>Extract UGC-specific features from a pretrained CONTRIQUE model</li>
+            <li>Extract semantic features from a pretrained CLIP-based encoder</li>
+            <li>Extract HDR features via a piecewise non-linear luminance transform with MSCN</li>
+            <li>These features are regressed to MOS by SVR with temporal differences features.</li>
+          </ul>
+        </div>
+
+
+        <figure class="image">
+          <img src="images/overview-model.jpg" alt="BrightRate Model">
+        </figure>
+
+        <br>
+        <h4 class="subtitle"><b>Performance Comparison:</b></h4>
+        <p>
+          We evaluated our <i><b>BrightRate</b></i> results on three public-available HDR dataset, including <i><b>BrightVQ</b></i> (ours), LIVE-HDR and SFV+HDR. We use SROCC as the final results shown here.
+        </p>
+        <br>
+        <div class="table-container">
+          <table class="table is-bordered is-striped is-hoverable is-fullwidth is-centered">
+            <thead>
+              <tr>
+                <th style="width: 13%;"><strong>Dataset</strong></th>
+                <th style="width: 13%;"><strong>COVER</strong></th>
+                <th style="width: 13%;"><strong>DOVER</strong></th>
+                <th style="width: 13%;"><strong>FastVQA</strong></th>
+                <th style="width: 13%;"><strong>HDRChipQA</strong></th>
+                <th style="width: 13%;"><strong>HIDROVQA</strong></th>
+                <th style="width: 13%;"><strong>BrightRate</strong></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>BrightVQ</strong></td>
+                <td>0.7609</td>
+                <td>0.7745</td>
+                <td>0.8094</td>
+                <td>0.6781</td>
+                <td>0.8526</td>
+                <td><strong>0.8887</strong></td>
+              </tr>
+              <tr>
+                <td><strong>LIVE-HDR</strong></td>
+                <td>0.5022</td>
+                <td>0.6303</td>
+                <td>0.5182</td>
+                <td>0.8250</td>
+                <td>0.8793</td>
+                <td><strong>0.8907</strong></td>
+              </tr>
+              <tr>
+                <td><strong>SFV+HDR</strong></td>
+                <td>0.6613</td>
+                <td>0.6001</td>
+                <td>0.7130</td>
+                <td>0.6296</td>
+                <td>0.7003</td>
+                <td><strong>0.7328</strong></td>
+              </tr>
+            </tbody>
+          </table>
+      </div>
+    </div>
   </section>
+
+<!-- Sample Video Embeds -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">
+      Video Samples in BrightVQ
+    </h2>
+
+    <!-- Portrait Videos -->
+    <h3 class="title is-4">Sample Videos (Portraits)</h3>
+    <div class="columns is-multiline">
+      <!-- Video Cards -->
+      <div class="column is-one-third">
+        <div class="card">
+          <div class="card-image">
+            <video class="video-card" controls>
+              <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/9ae245a27cc5ea9d2f3fae9692250281.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="card-content has-text-centered">
+            <p class="subtitle">Indoor Scene</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-one-third">
+        <div class="card">
+          <div class="card-image">
+            <video class="video-card" controls>
+              <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/6ecb44305c0a4c421201b7bcfd369acb.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="card-content has-text-centered">
+            <p class="subtitle">Museum</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-one-third">
+        <div class="card">
+          <div class="card-image">
+            <video class="video-card" controls>
+              <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/3c3383f24edcecacbc34650e30aa2f64.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="card-content has-text-centered">
+            <p class="subtitle">Costumes</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-one-third">
+        <div class="card">
+          <div class="card-image">
+            <video class="video-card" controls>
+              <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/29111a67d169ffa7efafb7fdc95b0191.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="card-content has-text-centered">
+            <p class="subtitle">Kayaking</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-one-third">
+        <div class="card">
+          <div class="card-image">
+            <video class="video-card" controls>
+              <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/1332df49188edc90be56df16975925ae.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="card-content has-text-centered">
+            <p class="subtitle">City</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-one-third">
+        <div class="card">
+          <div class="card-image">
+            <video class="video-card" controls>
+              <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/7435fdf9b5cda9a4299a7be5707ff911.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="card-content has-text-centered">
+            <p class="subtitle">Mountains</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Landscape Videos -->
+    <h3 class="title is-4 mt-6">Sample Videos (Landscapes)</h3>
+    <div class="columns is-multiline">
+      <div class="column is-one-third">
+        <div class="card">
+          <div class="card-image">
+            <video class="video-card" controls>
+              <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/273a5d8a3b8c2d0eb4d4c8ff5fcfe360.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="card-content has-text-centered">
+            <p class="subtitle">Carousel</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-one-third">
+        <div class="card">
+          <div class="card-image">
+            <video class="video-card" controls>
+              <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/482dc1789b58cd2a353408602e9cd903.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="card-content has-text-centered">
+            <p class="subtitle">Nature</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-one-third">
+        <div class="card">
+          <div class="card-image">
+            <video class="video-card" controls>
+              <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/711db6f2e68898d8ff6c3755959b4b58.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="card-content has-text-centered">
+            <p class="subtitle">Sunset</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-one-third">
+        <div class="card">
+          <div class="card-image">
+            <video class="video-card" controls>
+              <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/872987b2f1fb9ae521bb530cc81431bc.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="card-content has-text-centered">
+            <p class="subtitle">Screen</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-one-third">
+        <div class="card">
+          <div class="card-image">
+            <video class="video-card" controls>
+              <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/422c625efdcdb6df6da4ec26d5d52ddd.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="card-content has-text-centered">
+            <p class="subtitle">Light Show</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-one-third">
+        <div class="card">
+          <div class="card-image">
+            <video class="video-card" controls>
+              <source src="https://ugchdrmturk.s3.us-east-2.amazonaws.com/videos/049e611e4432f4aabdd5f54f22d1f358.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="card-content has-text-centered">
+            <p class="subtitle">Birds</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 
   <!-- BibTex citation -->
   <section class="section" id="BibTeX">
