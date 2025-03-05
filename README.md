@@ -52,11 +52,8 @@ This dataset serves as a benchmark for **No-Reference (NR) UGC HDR-VQA models** 
 ---
 ## ✨ Run BrightRate
 
-### Prepare environment
+Please follow --> Demo_Inference
 
-### Run our demo
-
-### Train on Custom Dataset
 ---
 
 ##  ⬇️ Downloading our BrightVQ Dataset
