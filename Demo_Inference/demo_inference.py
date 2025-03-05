@@ -615,22 +615,3 @@ def main():
 if __name__ == '__main__':
     main()
 
-
-####################### Useful instructions ####################### 
-""" 
-Command: 
-python demo_inference.py  --model_path ./models/brightrate_brightvq.pt  --dataset_csv ./sample_videos.csv --video_path
-./sample_videos/ --save_path ./demo-feats/ --parallel_level video --num_workers -1 --num_frames 30 --ffmpeg_path /work/09032/saini_2/ls6/LIVE-Work/
-
-To run on multiple nodes:
-    --> mpirun -np 4 python demo_inference.py --method_qa combined_features
-
-To run a specific part on a single node:
-    --> python demo_inference.py --curr_data_part 0 --total_data_part 4
-    
-To run feature dimension inspection:
-    --> python demo_inference.py --inspect
-
-Example for processing YUV files:
-    --> python demo_inference.py --method_qa brightrate --read_yuv --dataset_csv /work/09032/saini_2/ls6/LIVE-Work/UGC-HDR/QA-models/updated_Final_CSV_DATA_300_vimeo_sampled.csv --video_path /scratch/09032/saini_2/shreshth/UGC_HDR/yuv/ --save_path /work/09032/saini_2/ls6/LIVE-Work/UGC-HDR/QA-Demo-feats/ --parallel_level video --num_workers -1 --num_frames 30
-"""
